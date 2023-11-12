@@ -26,7 +26,7 @@ jobs:
           with:
             node-version: "18.x"
         - run: yarn install --immutable
-        - run:  npm i ardrive-cli
+        - run:  npm i -g ardrive-cli
         - name: Create wallet file
           run: |
             WALLET=$(mktemp)
