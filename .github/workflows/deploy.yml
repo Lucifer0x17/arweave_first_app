@@ -1,0 +1,44 @@
+name: Deploy on Arweave
+
+on:
+  push:
+    branches:
+      - master
+
+
+jobs:
+    deploy:
+        name: deply-using-ardrive
+        runs-on: ubuntu-latest
+        env:
+            WALLET_SEED: ${{secrets.WALLET_SEED}}
+            HH_ARWEAVE_FOLDER: ${{vars.HH_ARWEAVE_FOLDER}}
+
+        steps:
+        - uses: actions/checkout@v2
+        - name: Cache dependencies
+          uses: actions/cache@v2
+          with:
+            path: ~/.cache/yarn
+            key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+            restore-keys: ${{ runner.os }}-yarn-
+        - uses: actions/setup-node@v1
+          with:
+            node-version: "18.x"
+        - run: yarn install --immutable
+        - run:  npm i ardrive-cli
+        - name: Create wallet file
+          run: |
+            WALLET=$(mktemp)
+            ardrive generate-wallet -s WALLET_SEED > $WALLET
+        - name: Build Project
+          run: yarn build
+        - name: Create new Folder
+          run: |
+            FOLDER = $(ardrive create-folder -w $WALLET -F HH_ARWEAVE_FOLDER -n ${{ github.run_number }} --turbo | jq -r '.created[0].entityId')
+        - name: upload file
+          run: ardrive upload-file -w $WALLET -l ./build/ -F $FOLDER  --turbo
+
+        - name: Cleanup temp file
+          run: |
+            rm $WALLET
