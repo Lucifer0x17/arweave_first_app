@@ -29,17 +29,16 @@ jobs:
         - run:  npm i -g ardrive-cli
         - name: Create wallet file
           run: |
-            WALLET=$(mktemp -t wallet.XXXXXXXXXX.json)
-            ardrive generate-wallet -s $WALLET_SEED > $WALLET
+            ardrive generate-wallet -s $WALLET_SEED > wallet.json
             cat $WALLET
         - name: Build Project
           run: yarn build
         - name: Create new Folder
           run: |
-            FOLDER = $(ardrive create-folder -w $WALLET -F HH_ARWEAVE_FOLDER -n ${{ github.run_number }} --turbo | jq -r '.created[0].entityId')
+            FOLDER = $(ardrive create-folder -w ./wallet.json -F HH_ARWEAVE_FOLDER -n ${{ github.run_number }} --turbo | jq -r '.created[0].entityId')
         - name: upload file
-          run: ardrive upload-file -w $WALLET -l ./build/ -F $FOLDER  --turbo
+          run: ardrive upload-file -w ./wallet.json -l ./build/ -F $FOLDER  --turbo
 
-        - name: Cleanup temp file
-          run: |
-            rm $WALLET
+        # - name: Cleanup temp file
+        #   run: |
+        #     rm $WALLET
