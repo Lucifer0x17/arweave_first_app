@@ -30,7 +30,6 @@ jobs:
         - name: Create wallet file
           run: |
             WALLET=$(mktemp)
-            cat $WALLET_SEED
             ardrive generate-wallet -s $WALLET_SEED > $WALLET
             cat $WALLET
         - name: Build Project
