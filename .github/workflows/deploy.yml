@@ -30,7 +30,7 @@ jobs:
         - name: Create wallet file
           run: |
             ardrive generate-wallet -s WALLET_SEED > wallet.json
-            cat $WALLET
+            cat $WALLET_SEED
         - name: Build Project
           run: yarn build
         - name: Create new Folder
